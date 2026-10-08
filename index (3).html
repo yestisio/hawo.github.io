@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#0f3d3e; --deep2:#14504f; --tape:#ffd23f; --tomato:#ff5d47;
+  --paper:#f7f3e8; --ink:#1d2b2b;
+  --sans:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif; --hand:'Caveat','Segoe Script',cursive;
+}
+*{box-sizing:border-box;margin:0}
+html{background:var(--deep)}
+body{
+  min-height:100vh;color:var(--paper);font-family:var(--sans);font-size:17px;
+  background:
+    radial-gradient(circle at 20% 0%,var(--deep2),transparent 55%),
+    var(--deep);
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+button,input{font:inherit}
+.hidden{display:none!important}
+
+/* gate */
+#gate{min-height:100vh;display:grid;place-content:center;gap:18px;text-align:center;padding:24px}
+#gate h1{font-size:clamp(2.6rem,11vw,4.4rem);font-weight:800;line-height:.95;letter-spacing:-.02em}
+#gate p{font-family:var(--hand);font-size:1.6rem;color:var(--tape)}
+#gate input{
+  background:var(--paper);border:0;border-radius:10px;color:var(--ink);
+  text-align:center;padding:14px;font-size:1.1rem;outline:none;width:min(280px,80vw);justify-self:center;
+  transform:rotate(-1.5deg)
+}
+#gate input:focus-visible{outline:3px solid var(--tape)}
+.btn{
+  background:var(--tomato);color:#fff;border:0;border-radius:10px;padding:13px 26px;
+  cursor:pointer;font-weight:800;font-size:1.05rem;justify-self:center;
+  box-shadow:0 4px 0 #b53a2a;text-decoration:none;display:inline-block
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b53a2a}
+.btn:focus-visible,.x:focus-visible,.polaroid:focus-visible{outline:3px solid var(--tape);outline-offset:3px}
+.btn[disabled]{opacity:.6;cursor:wait}
+#err{color:#ffb4a8;min-height:1.4em}
+
+/* header */
+header{text-align:center;padding:52px 20px 24px}
+header h1{font-size:clamp(2.6rem,10vw,5rem);font-weight:800;line-height:.95;letter-spacing:-.02em}
+#days{margin-top:14px;font-family:var(--hand);font-size:1.8rem;color:var(--tape)}
+
+/* upload */
+.upload{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:8px 20px 36px}
+.upload input[type=text]{
+  background:rgba(247,243,232,.1);border:2px dashed rgba(247,243,232,.45);border-radius:10px;
+  color:var(--paper);padding:12px 16px;width:min(340px,90vw);outline:none
+}
+.upload input[type=text]::placeholder{color:rgba(247,243,232,.6)}
+.upload input[type=text]:focus-visible{border-color:var(--tape)}
+#status{width:100%;text-align:center;color:var(--tape);min-height:1.4em}
+
+/* scrapbook */
+#grid{display:flex;flex-wrap:wrap;gap:40px 30px;justify-content:center;padding:10px 20px 90px;max-width:1100px;margin:auto}
+.polaroid{
+  position:relative;width:230px;background:var(--paper);color:var(--ink);padding:12px 12px 14px;border:0;text-align:left;
+  cursor:pointer;box-shadow:0 12px 24px rgba(0,0,0,.35);transform:rotate(var(--r,0deg));transition:transform .2s ease
+}
+.polaroid::before{ /* washi tape */
+  content:"";position:absolute;top:-12px;left:50%;width:84px;height:24px;margin-left:-42px;
+  background:var(--tape);opacity:.9;transform:rotate(var(--t,-3deg));
+  clip-path:polygon(0 8%,4% 0,8% 10%,12% 0,100% 0,100% 100%,12% 100%,8% 90%,4% 100%,0 92%)
+}
+.polaroid:nth-child(3n)::before{background:var(--tomato)}
+.polaroid:hover{transform:rotate(0) scale(1.04)}
+.polaroid img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#c9c4b4}
+.polaroid span{display:block;font-family:var(--hand);font-weight:700;font-size:1.5rem;line-height:1.1;margin-top:10px;min-height:1.7rem}
+.polaroid small{display:block;font-size:.82rem;opacity:.6}
+#empty{text-align:center;color:var(--tape);font-family:var(--hand);font-size:1.7rem;padding:40px 20px}
+
+/* lightbox */
+#lb{position:fixed;inset:0;background:rgba(6,28,28,.95);display:grid;place-items:center;padding:20px;z-index:10}
+#lb .box{max-width:min(920px,100%);max-height:100%;display:grid;gap:14px;justify-items:center}
+#lb img,#lb iframe{max-width:100%;max-height:68vh;border:0;border-radius:6px}
+#lb iframe{width:min(860px,92vw);height:60vh}
+#lbcap{font-family:var(--hand);font-weight:700;font-size:1.9rem;text-align:center}
+.row{display:flex;gap:12px}
+.x{background:transparent;border:2px solid var(--paper);color:var(--paper);border-radius:10px;padding:11px 24px;cursor:pointer;font-weight:800}
+
+@media (prefers-reduced-motion:reduce){.polaroid{transition:none}}
+</style>
+</head>
+<body>
+
+<section id="gate">
+  <h1>Our<br>Archive</h1>
+  <p>Password, please</p>
+  <input id="pw" type="password" autocomplete="current-password" aria-label="Password">
+  <button class="btn" id="enter">Let me in</button>
+  <div id="err" role="alert"></div>
+</section>
+
+<main id="app" class="hidden">
+  <header>
+    <h1 id="title"></h1>
+    <div id="days"></div>
+  </header>
+
+  <div class="upload">
+    <input type="text" id="caption" placeholder="What was happening? (optional)" maxlength="80">
+    <button class="btn" id="add">Add a memory</button>
+    <input type="file" id="file" accept="image/*,video/*" multiple class="hidden">
+    <div id="status" role="status"></div>
+  </div>
+
+  <div id="grid"></div>
+  <div id="empty" class="hidden">Nothing here yet. Add the first one.</div>
+</main>
+
+<div id="lb" class="hidden" role="dialog" aria-modal="true">
+  <div class="box">
+    <div id="lbmedia"></div>
+    <div id="lbcap"></div>
+    <div class="row">
+      <a class="btn" id="dl">Download</a>
+      <button class="x" id="close">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== EDIT THIS PART ====== */
+const API = 'https://script.google.com/macros/s/AKfycbwFIVjDg1pktTkg-usjLUZs-mujMSYjZJAxRl1b6Smsdbdn6VDDAEasCh7V2GHq4rdi/exec';
+const NAMES = 'Ravenor';          // shown as the page title
+const START = '2025-05-05';           // the day it all started (YYYY-MM-DD)
+const MAX_MB = 20;                    // max size per file
+/* ============================ */
+
+const $ = id => document.getElementById(id);
+let pw = '';
+
+$('title').textContent = NAMES;
+const days = Math.floor((Date.now() - new Date(START)) / 864e5);
+$('days').textContent = days > 0 ? `${days.toLocaleString('en-US')} days of being a team` : '';
+
+async function load() {
+  const res = await fetch(`${API}?pw=${encodeURIComponent(pw)}`);
+  const data = await res.json();
+  if (data.error) throw new Error('wrong');
+  render(data.files);
+}
+
+function render(files) {
+  const grid = $('grid');
+  grid.innerHTML = '';
+  $('empty').classList.toggle('hidden', files.length > 0);
+  files.forEach((f, i) => {
+    const b = document.createElement('button');
+    b.className = 'polaroid';
+    b.style.setProperty('--r', ((i * 37) % 7 - 3) + 'deg');
+    b.style.setProperty('--t', ((i * 53) % 9 - 4) + 'deg');
+    const d = new Date(f.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.alt = f.caption || f.name;
+    img.src = `https://drive.google.com/thumbnail?id=${f.id}&sz=w600`;
+    const cap = document.createElement('span');
+    cap.textContent = f.caption || 'untitled chaos';
+    const dt = document.createElement('small');
+    dt.textContent = d;
+    b.append(img, cap, dt);
+    b.onclick = () => openLb(f);
+    grid.appendChild(b);
+  });
+}
+
+function openLb(f) {
+  const m = $('lbmedia');
+  m.innerHTML = '';
+  if (f.type.startsWith('video/')) {
+    const fr = document.createElement('iframe');
+    fr.src = `https://drive.google.com/file/d/${f.id}/preview`;
+    fr.allow = 'autoplay; fullscreen';
+    m.appendChild(fr);
+  } else {
+    const im = document.createElement('img');
+    im.src = `https://drive.google.com/thumbnail?id=${f.id}&sz=w1600`;
+    im.alt = f.caption || f.name;
+    m.appendChild(im);
+  }
+  $('lbcap').textContent = f.caption;
+  $('dl').href = `https://drive.google.com/uc?export=download&id=${f.id}`;
+  $('lb').classList.remove('hidden');
+  $('close').focus();
+}
+function closeLb() { $('lb').classList.add('hidden'); $('lbmedia').innerHTML = ''; }
+$('close').onclick = closeLb;
+$('lb').onclick = e => { if (e.target.id === 'lb') closeLb(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLb(); });
+
+/* sign in */
+async function enter() {
+  pw = $('pw').value;
+  $('err').textContent = '';
+  $('enter').disabled = true;
+  try {
+    await load();
+    try { sessionStorage.setItem('pw', pw); } catch (e) {}
+    $('gate').classList.add('hidden');
+    $('app').classList.remove('hidden');
+  } catch (e) {
+    $('err').textContent = 'Wrong password, or the server is not set up yet. Try again.';
+  }
+  $('enter').disabled = false;
+}
+$('enter').onclick = enter;
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') enter(); });
+try { const s = sessionStorage.getItem('pw'); if (s) { $('pw').value = s; enter(); } } catch (e) {}
+
+/* upload */
+$('add').onclick = () => $('file').click();
+$('file').onchange = async () => {
+  const files = [...$('file').files];
+  if (!files.length) return;
+  $('add').disabled = true;
+  let ok = 0;
+  for (const [i, f] of files.entries()) {
+    $('status').textContent = `Uploading ${i + 1} of ${files.length}…`;
+    if (f.size > MAX_MB * 1048576) { $('status').textContent = `${f.name} is over ${MAX_MB} MB, skipped.`; continue; }
+    try {
+      const data = await toBase64(f);
+      await fetch(API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ pw, name: f.name, type: f.type, data, caption: $('caption').value.trim() })
+      });
+      ok++;
+    } catch (e) {
+      $('status').textContent = `Could not upload ${f.name}. Try again.`;
+    }
+  }
+  $('file').value = '';
+  $('caption').value = '';
+  if (ok) { $('status').textContent = `${ok} memory saved.`; await load(); }
+  $('add').disabled = false;
+};
+
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>
