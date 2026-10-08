@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Our Archive</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;800&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep:#0f3d3e; --deep2:#14504f; --tape:#ffd23f; --tomato:#ff5d47;
+  --paper:#f7f3e8; --ink:#1d2b2b;
+  --sans:'Bricolage Grotesque','Helvetica Neue',Arial,sans-serif; --hand:'Caveat','Segoe Script',cursive;
+}
+*{box-sizing:border-box;margin:0}
+html{background:var(--deep)}
+body{
+  min-height:100vh;color:var(--paper);font-family:var(--sans);font-size:17px;
+  background:radial-gradient(circle at 20% 0%,var(--deep2),transparent 55%),var(--deep);
+  padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+}
+button,input,select{font:inherit}
+.hidden{display:none!important}
+
+/* ---------- gate ---------- */
+#gate{min-height:100vh;display:grid;place-content:center;gap:18px;text-align:center;padding:24px}
+#gate h1{font-size:clamp(2.6rem,11vw,4.4rem);font-weight:800;line-height:.95;letter-spacing:-.02em}
+#gate p{font-family:var(--hand);font-size:1.6rem;color:var(--tape)}
+#gate input{
+  background:var(--paper);border:0;border-radius:10px;color:var(--ink);text-align:center;
+  padding:14px;font-size:1.1rem;outline:none;width:min(280px,80vw);justify-self:center;transform:rotate(-1.5deg)
+}
+#gate input:focus-visible{outline:3px solid var(--tape)}
+#err{color:#ffb4a8;min-height:1.4em}
+
+/* ---------- buttons ---------- */
+.btn{
+  background:var(--tomato);color:#fff;border:0;border-radius:10px;padding:12px 24px;cursor:pointer;
+  font-weight:800;font-size:1.02rem;box-shadow:0 4px 0 #b53a2a;text-decoration:none;display:inline-block;justify-self:center
+}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #b53a2a}
+.btn[disabled]{opacity:.6;cursor:wait}
+.x{
+  background:transparent;border:2px solid rgba(247,243,232,.6);color:var(--paper);border-radius:10px;
+  padding:9px 16px;cursor:pointer;font-weight:500;text-decoration:none;display:inline-block
+}
+.x.warn{border-color:#ff9a8c;color:#ffb4a8}
+.btn:focus-visible,.x:focus-visible,.chip:focus-visible,.open:focus-visible,.fav:focus-visible{outline:3px solid var(--tape);outline-offset:3px}
+
+/* ---------- header ---------- */
+header{text-align:center;padding:48px 20px 18px}
+header h1{font-size:clamp(2.6rem,10vw,5rem);font-weight:800;line-height:.95;letter-spacing:-.02em}
+#days{margin-top:14px;font-family:var(--hand);font-size:1.8rem;color:var(--tape)}
+#mile{font-family:var(--hand);font-size:1.4rem;color:var(--paper);opacity:.85}
+#stats{margin-top:8px;font-size:.92rem;opacity:.7}
+
+/* ---------- upload + tools ---------- */
+.upload,.tools{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;padding:8px 20px 14px}
+.upload{padding-top:18px}
+.field{
+  background:rgba(247,243,232,.1);border:2px dashed rgba(247,243,232,.45);border-radius:10px;
+  color:var(--paper);padding:11px 15px;outline:none;max-width:90vw
+}
+.field::placeholder{color:rgba(247,243,232,.6)}
+.field:focus-visible{border-color:var(--tape)}
+.field option{color:var(--ink)}
+#caption{width:min(340px,90vw)}
+#q{width:min(260px,90vw)}
+#status{width:100%;text-align:center;color:var(--tape);min-height:1.4em}
+
+/* ---------- chips ---------- */
+#chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;padding:6px 20px 26px;max-width:900px;margin:auto}
+.chip{background:transparent;border:2px solid rgba(247,243,232,.5);color:var(--paper);border-radius:999px;padding:7px 16px;cursor:pointer}
+.chip.on{background:var(--tape);border-color:var(--tape);color:var(--ink);font-weight:800}
+
+/* ---------- scrapbook ---------- */
+#grid{display:flex;flex-wrap:wrap;gap:40px 30px;justify-content:center;padding:10px 20px 90px;max-width:1100px;margin:auto}
+.month{flex-basis:100%;text-align:left;font-family:var(--hand);font-size:2rem;color:var(--tape);margin-top:8px}
+.polaroid{
+  position:relative;width:230px;background:var(--paper);color:var(--ink);padding:12px 12px 14px;
+  box-shadow:0 12px 24px rgba(0,0,0,.35);transform:rotate(var(--r,0deg));transition:transform .2s ease
+}
+.polaroid::before{
+  content:"";position:absolute;top:-12px;left:50%;width:84px;height:24px;margin-left:-42px;pointer-events:none;
+  background:var(--tape);opacity:.9;transform:rotate(var(--t,-3deg));
+  clip-path:polygon(0 8%,4% 0,8% 10%,12% 0,100% 0,100% 100%,12% 100%,8% 90%,4% 100%,0 92%)
+}
+.polaroid:nth-of-type(3n)::before{background:var(--tomato)}
+.polaroid:hover{transform:rotate(0) scale(1.03)}
+.open{display:block;width:100%;background:none;border:0;padding:0;text-align:left;color:inherit;cursor:pointer}
+.open img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#c9c4b4}
+.open span{display:block;font-family:var(--hand);font-weight:700;font-size:1.5rem;line-height:1.1;margin-top:10px;min-height:1.7rem}
+.open small{display:block;font-size:.82rem;opacity:.6}
+.vid{position:absolute;left:20px;top:20px;background:rgba(15,61,62,.85);color:var(--paper);font-size:.8rem;padding:3px 9px;border-radius:999px}
+.fav{
+  position:absolute;right:18px;top:18px;width:38px;height:38px;border-radius:50%;border:0;cursor:pointer;
+  background:rgba(247,243,232,.92);color:var(--tomato);font-size:1.3rem;line-height:1;box-shadow:0 2px 6px rgba(0,0,0,.25)
+}
+#empty{text-align:center;color:var(--tape);font-family:var(--hand);font-size:1.7rem;padding:40px 20px}
+
+/* ---------- lightbox ---------- */
+#lb{position:fixed;inset:0;background:rgba(6,28,28,.96);display:grid;place-items:center;padding:16px;z-index:10;overflow:auto}
+#lb .box{max-width:min(920px,100%);display:grid;gap:12px;justify-items:center}
+#lbmedia{display:grid;place-items:center;min-height:120px}
+#lb img,#lb iframe{max-width:100%;max-height:60vh;border:0;border-radius:6px}
+#lb iframe{width:min(860px,92vw);height:56vh}
+#lbcap{font-family:var(--hand);font-weight:700;font-size:1.9rem;text-align:center;line-height:1.1}
+#lbmeta{font-size:.9rem;opacity:.7;text-align:center}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.nav{width:48px;padding:9px 0;text-align:center;font-size:1.2rem}
+#edit{display:grid;gap:10px;justify-items:center;background:rgba(247,243,232,.08);border-radius:12px;padding:14px;width:min(420px,92vw)}
+#edit .field{width:100%}
+
+@media (prefers-reduced-motion:reduce){.polaroid{transition:none}}
+</style>
+</head>
+<body>
+
+<section id="gate">
+  <h1>Our<br>Archive</h1>
+  <p>Password, please</p>
+  <input id="pw" type="password" autocomplete="current-password" aria-label="Password">
+  <button class="btn" id="enter">Let me in</button>
+  <div id="err" role="alert"></div>
+</section>
+
+<main id="app" class="hidden">
+  <header>
+    <h1 id="title"></h1>
+    <div id="days"></div>
+    <div id="mile"></div>
+    <div id="stats"></div>
+  </header>
+
+  <div class="upload">
+    <input class="field" type="text" id="caption" placeholder="What was happening? (optional)" maxlength="80">
+    <select class="field hidden" id="dest" aria-label="Save in folder"></select>
+    <button class="btn" id="add">Add a memory</button>
+    <input type="file" id="file" accept="image/*,video/*" multiple class="hidden">
+    <div id="status" role="status"></div>
+  </div>
+
+  <div class="tools">
+    <input class="field" type="search" id="q" placeholder="Search memories" aria-label="Search memories">
+    <select class="field" id="sort" aria-label="Sort order">
+      <option value="new">Newest first</option>
+      <option value="old">Oldest first</option>
+    </select>
+    <button class="x" id="surprise">Surprise me</button>
+    <button class="x" id="slide">Slideshow</button>
+    <button class="x" id="album">New album</button>
+  </div>
+
+  <div id="chips" class="hidden"></div>
+  <div id="grid"></div>
+  <div id="empty" class="hidden"></div>
+</main>
+
+<div id="lb" class="hidden" role="dialog" aria-modal="true" aria-label="Memory viewer">
+  <div class="box">
+    <div id="lbmedia"></div>
+    <div id="lbcap"></div>
+    <div id="lbmeta"></div>
+
+    <div id="edit" class="hidden">
+      <input class="field" type="text" id="ecap" placeholder="Caption" maxlength="80" aria-label="Caption">
+      <input class="field" type="date" id="edate" aria-label="Date of this memory">
+      <div class="row">
+        <button class="btn" id="esave">Save</button>
+        <button class="x" id="ecancel">Cancel</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <button class="x nav" id="prev" aria-label="Previous">&#8249;</button>
+      <button class="x" id="lfav" aria-label="Favorite">&#9825; Favorite</button>
+      <button class="x" id="lplay">Play</button>
+      <button class="x nav" id="next" aria-label="Next">&#8250;</button>
+    </div>
+    <div class="row">
+      <a class="btn" id="dl">Download</a>
+      <button class="x" id="ledit">Edit</button>
+      <button class="x warn" id="ldel">Delete</button>
+      <button class="x" id="close">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ====== EDIT THIS PART ====== */
+const API = 'https://script.google.com/macros/s/AKfycbwFIVjDg1pktTkg-usjLUZs-mujMSYjZJAxRl1b6Smsdbdn6VDDAEasCh7V2GHq4rdi/exec';
+const NAMES = 'Ravenor';
+const START = '2025-05-05';           // the day it all started (YYYY-MM-DD)
+const MAX_MB = 20;                    // max size per file
+/* ============================ */
+
+const $ = id => document.getElementById(id);
+let pw = '';
+let all = [], folders = [], list = [];
+let current = '*';           // '*' = all, '__fav' = favorites, otherwise folder path ('' = main)
+let idx = 0, curId = null, timer = null;
+
+/* ---------- header ---------- */
+$('title').textContent = NAMES;
+const startDate = new Date(START + 'T00:00:00');
+const dayCount = Math.floor((Date.now() - startDate) / 864e5);
+$('days').textContent = dayCount > 0 ? `${dayCount.toLocaleString('en-US')} days of being a team` : '';
+(function milestone() {
+  if (!(dayCount > 0)) return;
+  const now = new Date(); now.setHours(0, 0, 0, 0);
+  let n = (now.getFullYear() - startDate.getFullYear()) * 12 + now.getMonth() - startDate.getMonth();
+  let t = new Date(startDate.getFullYear(), startDate.getMonth() + n, startDate.getDate());
+  if (t < now) { n++; t = new Date(startDate.getFullYear(), startDate.getMonth() + n, startDate.getDate()); }
+  const d = Math.round((t - now) / 864e5);
+  const label = n % 12 === 0 ? `year ${n / 12}` : `month ${n}`;
+  $('mile').textContent = d === 0 ? `Today is ${label}!` : `${label} in ${d} day${d > 1 ? 's' : ''}`;
+})();
+
+/* ---------- api ---------- */
+async function api(body) {
+  try {
+    const r = await fetch(API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ pw, ...body })
+    });
+    return await r.json();
+  } catch (e) { return {}; }
+}
+function say(t) { $('status').textContent = t; }
+
+async function load() {
+  const res = await fetch(`${API}?pw=${encodeURIComponent(pw)}`);
+  const data = await res.json();
+  if (data.error) throw new Error('wrong');
+  all = data.files;
+  folders = data.folders || [];
+  const p = all.filter(f => !f.type.startsWith('video/')).length;
+  $('stats').textContent = all.length
+    ? `${p} photo${p === 1 ? '' : 's'} · ${all.length - p} video${all.length - p === 1 ? '' : 's'}` +
+      ` · ${all.filter(f => f.starred).length} favorite${all.filter(f => f.starred).length === 1 ? '' : 's'}`
+    : '';
+  drawChips(); drawDest(); render();
+}
+
+/* ---------- filters ---------- */
+function drawChips() {
+  const names = [...new Set(all.map(f => f.folder || ''))];
+  const box = $('chips');
+  box.innerHTML = '';
+  box.classList.toggle('hidden', all.length === 0);
+  const valid = ['*', '__fav', ...names];
+  if (!valid.includes(current)) current = '*';
+  const items = [['*', 'All'], ['__fav', '♥ Favorites']];
+  if (names.length > 1) names.forEach(n => items.push([n, n || 'Main']));
+  items.forEach(([v, label]) => {
+    const b = document.createElement('button');
+    b.className = 'chip' + (v === current ? ' on' : '');
+    b.textContent = label;
+    b.onclick = () => { current = v; drawChips(); render(); };
+    box.appendChild(b);
+  });
+}
+function drawDest() {
+  const s = $('dest');
+  const prev = s.value;
+  s.innerHTML = '';
+  s.add(new Option('Save in: Main', ''));
+  folders.forEach(f => s.add(new Option('Save in: ' + f.name, f.id)));
+  s.value = [...s.options].some(o => o.value === prev) ? prev : '';
+  s.classList.toggle('hidden', folders.length === 0);
+}
+function view() {
+  let L = all.slice();
+  if (current === '__fav') L = L.filter(f => f.starred);
+  else if (current !== '*') L = L.filter(f => (f.folder || '') === current);
+  const q = $('q').value.trim().toLowerCase();
+  if (q) L = L.filter(f => `${f.caption} ${f.name} ${f.folder}`.toLowerCase().includes(q));
+  const old = $('sort').value === 'old';
+  L.sort((a, b) => old ? a.taken - b.taken : b.taken - a.taken);
+  return L;
+}
+$('q').oninput = render;
+$('sort').onchange = render;
+
+/* ---------- gallery ---------- */
+const fmtDate = t => new Date(t).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const fmtMonth = t => new Date(t).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+const thumb = (f, w) => `https://drive.google.com/thumbnail?id=${f.id}&sz=w${w}`;
+
+function render() {
+  list = view();
+  const grid = $('grid');
+  grid.innerHTML = '';
+  const empty = $('empty');
+  empty.classList.toggle('hidden', list.length > 0);
+  if (!list.length) {
+    empty.textContent = all.length
+      ? (current === '__fav' ? 'No favorites yet. Tap the heart on a memory.' : 'Nothing matches that.')
+      : 'Nothing here yet. Add the first one.';
+  }
+  let lastMonth = '';
+  list.forEach((f, i) => {
+    const m = fmtMonth(f.taken);
+    if (m !== lastMonth) {
+      const h = document.createElement('h2');
+      h.className = 'month';
+      h.textContent = m;
+      grid.appendChild(h);
+      lastMonth = m;
+    }
+    const card = document.createElement('div');
+    card.className = 'polaroid';
+    card.style.setProperty('--r', ((i * 37) % 7 - 3) + 'deg');
+    card.style.setProperty('--t', ((i * 53) % 9 - 4) + 'deg');
+
+    const open = document.createElement('button');
+    open.className = 'open';
+    open.setAttribute('aria-label', 'Open ' + (f.caption || f.name));
+    const img = document.createElement('img');
+    img.loading = 'lazy';
+    img.alt = f.caption || f.name;
+    img.src = thumb(f, 600);
+    const cap = document.createElement('span');
+    cap.textContent = f.caption || 'untitled chaos';
+    const dt = document.createElement('small');
+    dt.textContent = fmtDate(f.taken) + (f.folder ? ' · ' + f.folder : '');
+    open.append(img, cap, dt);
+    open.onclick = () => openLb(i);
+
+    const fav = document.createElement('button');
+    fav.className = 'fav';
+    fav.textContent = f.starred ? '♥' : '♡';
+    fav.setAttribute('aria-label', f.starred ? 'Remove from favorites' : 'Add to favorites');
+    fav.setAttribute('aria-pressed', f.starred ? 'true' : 'false');
+    fav.onclick = () => toggleFav(f);
+
+    card.append(open, fav);
+    if (f.type.startsWith('video/')) {
+      const v = document.createElement('div');
+      v.className = 'vid';
+      v.textContent = 'video';
+      card.appendChild(v);
+    }
+    grid.appendChild(card);
+  });
+}
+
+async function toggleFav(f) {
+  f.starred = !f.starred;
+  render(); drawChips();
+  if (!$('lb').classList.contains('hidden')) paintLb();
+  await api({ action: 'star', id: f.id, starred: f.starred });
+}
+
+/* ---------- lightbox ---------- */
+function openLb(i) {
+  idx = i;
+  $('edit').classList.add('hidden');
+  $('lb').classList.remove('hidden');
+  paintLb();
+  $('close').focus();
+}
+function paintLb() {
+  const f = list[idx];
+  if (!f) { closeLb(); return; }
+  curId = f.id;
+  const m = $('lbmedia');
+  m.innerHTML = '';
+  if (f.type.startsWith('video/')) {
+    const fr = document.createElement('iframe');
+    fr.src = `https://drive.google.com/file/d/${f.id}/preview`;
+    fr.allow = 'autoplay; fullscreen';
+    m.appendChild(fr);
+  } else {
+    const im = document.createElement('img');
+    im.src = thumb(f, 1600);
+    im.alt = f.caption || f.name;
+    m.appendChild(im);
+  }
+  $('lbcap').textContent = f.caption;
+  $('lbmeta').textContent = `${fmtDate(f.taken)}${f.folder ? ' · ' + f.folder : ''} · ${idx + 1} of ${list.length}`;
+  $('lfav').textContent = f.starred ? '♥ Favorited' : '♡ Favorite';
+  $('dl').href = `https://drive.google.com/uc?export=download&id=${f.id}`;
+  $('prev').disabled = $('next').disabled = list.length < 2;
+}
+function step(d) {
+  if (!list.length) return;
+  idx = (idx + d + list.length) % list.length;
+  $('edit').classList.add('hidden');
+  paintLb();
+}
+function closeLb() {
+  stopPlay();
+  $('lb').classList.add('hidden');
+  $('lbmedia').innerHTML = '';
+}
+function startPlay() {
+  if (!list.length) return;
+  if ($('lb').classList.contains('hidden')) openLb(0);
+  stopPlay();
+  $('lplay').textContent = 'Pause';
+  timer = setInterval(() => step(1), 4000);
+}
+function stopPlay() {
+  if (timer) clearInterval(timer);
+  timer = null;
+  $('lplay').textContent = 'Play';
+}
+$('prev').onclick = () => step(-1);
+$('next').onclick = () => step(1);
+$('close').onclick = closeLb;
+$('lplay').onclick = () => timer ? stopPlay() : startPlay();
+$('lfav').onclick = () => toggleFav(list[idx]);
+$('lb').onclick = e => { if (e.target.id === 'lb') closeLb(); };
+document.addEventListener('keydown', e => {
+  if ($('lb').classList.contains('hidden')) return;
+  if (e.key === 'Escape') closeLb();
+  const typing = ['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName);
+  if (!typing && e.key === 'ArrowRight') step(1);
+  if (!typing && e.key === 'ArrowLeft') step(-1);
+});
+let sx = null;
+$('lb').addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+$('lb').addEventListener('touchend', e => {
+  if (sx === null) return;
+  const dx = e.changedTouches[0].clientX - sx;
+  sx = null;
+  if (Math.abs(dx) > 60 && !['INPUT'].includes(document.activeElement.tagName)) step(dx < 0 ? 1 : -1);
+});
+
+/* edit / delete */
+const isoLocal = t => { const d = new Date(t); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+$('ledit').onclick = () => {
+  const f = list[idx];
+  $('ecap').value = f.caption;
+  $('edate').value = isoLocal(f.taken);
+  $('edit').classList.remove('hidden');
+  $('ecap').focus();
+};
+$('ecancel').onclick = () => $('edit').classList.add('hidden');
+$('esave').onclick = async () => {
+  const f = list[idx];
+  const taken = $('edate').value ? new Date($('edate').value + 'T12:00:00').getTime() : f.taken;
+  $('esave').disabled = true;
+  await api({ action: 'update', id: f.id, caption: $('ecap').value.trim(), taken });
+  $('esave').disabled = false;
+  $('edit').classList.add('hidden');
+  await load();
+  const n = list.findIndex(x => x.id === curId);
+  if (n >= 0) { idx = n; paintLb(); }
+};
+$('ldel').onclick = async () => {
+  const f = list[idx];
+  if (!confirm('Move this to the trash? You can still restore it from Google Drive for 30 days.')) return;
+  closeLb();
+  say('Moving to trash…');
+  await api({ action: 'trash', id: f.id });
+  await load();
+  say('Moved to trash.');
+};
+
+/* ---------- tools ---------- */
+$('surprise').onclick = () => {
+  const L = list.length ? list : all;
+  if (!L.length) return;
+  if (L !== list) { current = '*'; $('q').value = ''; drawChips(); render(); }
+  openLb(Math.floor(Math.random() * list.length));
+};
+$('slide').onclick = startPlay;
+$('album').onclick = async () => {
+  const name = prompt('Name for the new album?');
+  if (!name || !name.trim()) return;
+  say('Creating album…');
+  const r = await api({ action: 'mkdir', name: name.trim(), folder: $('dest').value });
+  await load();
+  say(r.error ? 'Could not create the album.' : `Album "${name.trim()}" created. Pick it under "Save in".`);
+};
+
+/* ---------- sign in ---------- */
+async function enter() {
+  pw = $('pw').value.trim().toUpperCase(); // password is all caps; ignores keyboard auto-lowercase and trailing spaces
+  $('err').textContent = '';
+  $('enter').disabled = true;
+  try {
+    await load();
+    try { sessionStorage.setItem('pw', pw); } catch (e) {}
+    $('gate').classList.add('hidden');
+    $('app').classList.remove('hidden');
+  } catch (e) {
+    $('err').textContent = 'Wrong password, or the server is not set up yet. Try again.';
+  }
+  $('enter').disabled = false;
+}
+$('enter').onclick = enter;
+$('pw').addEventListener('keydown', e => { if (e.key === 'Enter') enter(); });
+try { const s = sessionStorage.getItem('pw'); if (s) { $('pw').value = s; enter(); } } catch (e) {}
+
+/* ---------- upload ---------- */
+$('add').onclick = () => $('file').click();
+$('file').onchange = async () => {
+  const files = [...$('file').files];
+  if (!files.length) return;
+  $('add').disabled = true;
+  let ok = 0;
+  for (const [i, f] of files.entries()) {
+    say(`Uploading ${i + 1} of ${files.length}…`);
+    if (f.size > MAX_MB * 1048576) { say(`${f.name} is over ${MAX_MB} MB, skipped.`); continue; }
+    try {
+      const data = await toBase64(f);
+      await api({
+        action: 'upload', name: f.name, type: f.type, data,
+        caption: $('caption').value.trim(), folder: $('dest').value, taken: f.lastModified
+      });
+      ok++;
+    } catch (e) {
+      say(`Could not upload ${f.name}. Try again.`);
+    }
+  }
+  $('file').value = '';
+  $('caption').value = '';
+  if (ok) { say(`${ok} memor${ok === 1 ? 'y' : 'ies'} saved.`); await load(); }
+  $('add').disabled = false;
+};
+function toBase64(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>
